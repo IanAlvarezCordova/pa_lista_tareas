@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../controller/tarea_controller.dart';
 import '../model/tarea.dart';
 
-
 class HomePages extends StatefulWidget {
   const HomePages({super.key});
 
@@ -45,6 +44,34 @@ class _HomePageState extends State<HomePages> {
     });
   }
 
+  void _editarTarea(int index, String tituloActual) {
+    final TextEditingController editarCtrl =
+        TextEditingController(text: tituloActual);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Editar tarea'),
+          content: TextField(controller: editarCtrl),
+          actions: [
+            TextButton(
+              onPressed: () {
+                if (editarCtrl.text.isNotEmpty) {
+                  setState(() {
+                    controller.editarTarea(editarCtrl.text, index);
+                  });
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _cambiarEstado(int index, bool completada) {
     setState(() {
       controller.cambiarEstado(index, completada);
@@ -78,8 +105,8 @@ class _HomePageState extends State<HomePages> {
             padding: EdgeInsets.all(16.0),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text("Tareas",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              child:
+                  Text("Tareas", style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
           Expanded(
@@ -88,7 +115,8 @@ class _HomePageState extends State<HomePages> {
               itemBuilder: (context, index) {
                 final tarea = controller.tareas[index];
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: Card(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
@@ -105,12 +133,21 @@ class _HomePageState extends State<HomePages> {
                               : TextDecoration.none,
                         ),
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _eliminarTarea(index),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () => _editarTarea(index, tarea.titulo),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _eliminarTarea(index),
+                          ),
+                        ],
                       ),
                       contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20),
+                          const EdgeInsets.symmetric(horizontal: 20),
                     ),
                   ),
                 );

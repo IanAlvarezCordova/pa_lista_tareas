@@ -36,7 +36,7 @@ class TareaController extends ChangeNotifier {
 
   //metodo para eliminar tarea
   void eliminarTarea(int index) {
-    _tareas.remove(index);
+    _tareas.removeAt(index); // ✅ Esto elimina correctamente por índice
     almacenamiento.guardarTareas(_tareas);
     notifyListeners();
   }
