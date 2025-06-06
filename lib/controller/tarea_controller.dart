@@ -34,5 +34,25 @@ class TareaController extends ChangeNotifier {
     notifyListeners();
   }
 
+  //metodo para eliminar tarea
+  void eliminarTarea(int index) {
+    _tareas.remove(index);
+    almacenamiento.guardarTareas(_tareas);
+    notifyListeners();
+  }
+
+  //metodo para editar
+  void editarTarea(String nuevoTitulo, int index) {
+    _tareas[index].titulo = nuevoTitulo;
+    almacenamiento.guardarTareas(_tareas);
+    notifyListeners();
+  }
+
+//cambiar estado
+  void cambiarEstado(int index, bool valor) {
+    _tareas[index].completado = valor;
+    almacenamiento.guardarTareas(_tareas);
+    notifyListeners();
+  }
   
 }

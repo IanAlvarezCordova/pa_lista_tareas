@@ -2,33 +2,36 @@ import 'package:flutter/material.dart';
 import '../controller/tarea_controller.dart';
 import '../model/tarea.dart';
 
-class HomePage extends StatefulWidget {
+
+class HomePages extends StatefulWidget {
+  const HomePages({super.key});
+
   @override
-  State<HomePage> createState() => HomePageState();
+  State<HomePages> createState() => _HomePageState();
 }
 
-class HomePageState extends State<HomePage> {
-  //logica
-  //instancia de la clase TareaController
+class _HomePageState extends State<HomePages> {
   final TareaController controller = TareaController();
 
-  void agregarTarea() {
+  void _agregarTarea() {
     showDialog(
       context: context,
       builder: (context) {
-        final TextEditingController tareacontroller = TextEditingController();
+        final TextEditingController tareaCtrl = TextEditingController();
         return AlertDialog(
-          title: Text('Nueva_Tarea'),
-          content: TextField(controller: tareacontroller),
+          title: const Text('Nueva tarea'),
+          content: TextField(controller: tareaCtrl),
           actions: [
             TextButton(
               onPressed: () {
-                setState(() {
-                  controller.agregarTarea(tareacontroller.text);
-                });
-                Navigator.pop(context);
+                if (tareaCtrl.text.isNotEmpty) {
+                  setState(() {
+                    controller.agregarTarea(tareaCtrl.text);
+                  });
+                  Navigator.pop(context);
+                }
               },
-              child: Text('Agregar'),
+              child: const Text('Agregar'),
             ),
           ],
         );
@@ -36,71 +39,79 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  //diseno
+  void _eliminarTarea(int index) {
+    setState(() {
+      controller.eliminarTarea(index);
+    });
+  }
+
+  void _cambiarEstado(int index, bool completada) {
+    setState(() {
+      controller.cambiarEstado(index, completada);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    //todo
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Listado de Tareas'),
-        backgroundColor: Colors.teal,
-      ),
       body: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             color: Theme.of(context).colorScheme.primary,
             child: Column(
               children: [
-                SizedBox(height: 50),
-                Icon(Icons.assignment, size: 80, color: Colors.white),
-                SizedBox(height: 10),
+                const SizedBox(height: 50),
+                const Icon(Icons.assignment, size: 80, color: Colors.white),
+                const SizedBox(height: 10),
                 Text(
-                  "Realiza tus tareas",
-                  style: Theme.of(context).textTheme.titleLarge,
+                  "Completa tus tareas",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge!
+                      .copyWith(color: Colors.white),
                 ),
               ],
             ),
           ),
-
-          Padding(
-            padding: EdgeInsets.all(20),
+          const Padding(
+            padding: EdgeInsets.all(16.0),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(
-                "Tareas",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              child: Text("Tareas",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ),
-
           Expanded(
             child: ListView.builder(
               itemCount: controller.tareas.length,
               itemBuilder: (context, index) {
-                Tarea tarea = controller.tareas[index];
+                final tarea = controller.tareas[index];
                 return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   child: Card(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: CheckboxListTile(
+                        borderRadius: BorderRadius.circular(12)),
+                    child: ListTile(
+                      leading: Checkbox(
+                        value: tarea.completado,
+                        onChanged: (valor) => _cambiarEstado(index, valor!),
+                      ),
                       title: Text(
-                          tarea.titulo,
-                          style: TextStyle(
-                            decoration: tarea.completado ? TextDecoration.lineThrough : TextDecoration.none,
-                          ),
+                        tarea.titulo,
+                        style: TextStyle(
+                          decoration: tarea.completado
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
                         ),
-                      value: tarea.completado,
-                      onChanged: (bool? valor) {
-                        setState(() {
-                          tarea.completado = valor ?? false;
-                        });
-                      },
-
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _eliminarTarea(index),
+                      ),
+                      contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20),
                     ),
-
                   ),
                 );
               },
@@ -109,8 +120,8 @@ class HomePageState extends State<HomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: agregarTarea,
-        child: Icon(Icons.add),
+        onPressed: _agregarTarea,
+        child: const Icon(Icons.add),
       ),
     );
   }
